@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Forever Love Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Caveat:wght@700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Mitr', sans-serif;
+        }
+
+        body {
+            background-color: #0f0a10;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Video Background Base Stylings */
+        .video-background {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        #videoBg1 {
+            opacity: 1;
+        }
+
+        #videoBg2 {
+            opacity: 0;
+        }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 10, 16, 0.2); 
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .heart-sparkle {
+            position: absolute;
+            color: rgba(255, 117, 140, 0.4);
+            animation: floatUp 6s linear infinite;
+            font-size: 1.2rem;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) translateX(0) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) translateX(50px) scale(1.2); opacity: 0; }
+        }
+
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 10, 16, 0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        filter 0.8s ease;
+            padding: 20px;
+            text-align: center;
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0px);
+        }
+
+        .lock-screen.fade-out {
+            opacity: 0;
+            transform: scale(1.15);
+            filter: blur(10px);
+            pointer-events: none;
+        }
+
+        .lock-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px 35px;
+            border-radius: 30px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            max-width: 420px;
+            width: 100%;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .lock-avatar-container {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(45deg, #ff5e62, #ff9966);
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .lock-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #1a0f1d;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .lock-card h2 {
+            font-family: 'Caveat', cursive;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .lock-card p {
+            font-size: 0.95rem;
+            color: #e5daf0;
+            margin-bottom: 30px;
+            font-weight: 300;
+            line-height: 1.5;
+            text-align: center;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .day-input {
+            flex: 1;
+            width: 50%;
+            padding: 14px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(15, 10, 16, 0.6);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            height: 52px;
+        }
+
+        .day-input:focus {
+            border-color: #ff758c;
+            background: rgba(15, 10, 16, 0.8);
+            box-shadow: 0 0 12px rgba(255, 117, 140, 0.3);
+        }
+
+        .day-input::placeholder {
+            color: #8c7e90;
+        }
+
+        .select-wrapper {
+            position: relative;
+            flex: 1;
+            width: 50%;
+            height: 52px;
+        }
+
+        .month-select {
+            width: 100%;
+            height: 100%;
+            padding: 0 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(15, 10, 16, 0.6);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+            text-align-last: center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .select-wrapper::after {
+            content: '▾';
+            font-size: 1.1rem;
+            color: #ff9a9e;
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .month-select:focus {
+            border-color: #ff758c;
+            background: rgba(15, 10, 16, 0.8);
+            box-shadow: 0 0 12px rgba(255, 117, 140, 0.3);
+        }
+
+        .month-select option {
+            background: #1a0f1d;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .unlock-btn {
+            background: linear-gradient(45deg, #ff5e62, #ff9966);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .unlock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 94, 98, 0.6);
+        }
+
+        .error-msg {
+            color: #ff5e62;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            display: none;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .main-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.215, 0.610, 0.355, 1), 
+                        transform 1s cubic-bezier(0.215, 0.610, 0.355, 1);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 40px 20px;
+            z-index: 3;
+            margin: 0 auto;
+        }
+
+        .main-content.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .relationship-date {
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        .relationship-date h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 4rem;
+            background: linear-gradient(45deg, #ff758c, #ff7eb3, #ffb3c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            text-shadow: 0 4px 15px rgba(255, 117, 140, 0.5);
+            text-align: center;
+        }
+
+        .relationship-date p {
+            font-size: 1.15rem;
+            color: #ffb3c1;
+            letter-spacing: 1.5px;
+            font-weight: 300;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .main-button-container {
+            position: relative;
+            cursor: pointer;
+            display: block;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto 40px auto;
+            text-align: center;
+            width: fit-content;
+        }
+
+        .main-button-container:hover {
+            transform: scale(1.06);
+        }
+
+        /* ปรับกรอบรูปหน้าหลักให้คลุมพื้นที่อย่างสวยงาม */
+        .image-frame {
+            position: relative;
+            padding: 0; /* ถอด Padding ขาวออกเพื่อให้รูปวิ่งไปชนขอบขอบกรอบมล */
+            background: #ffffff;
+            border-radius: 32px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: block;
+            margin: 0 auto;
+            width: 280px;
+            height: 280px;
+            overflow: hidden; /* ควบคุมส่วนเกินของรูปให้อยู่ในกรอบโค้ง */
+        }
+
+        /* ปรับรูปหน้าปกให้สเกลขยายเต็มหน้ากรอบ */
+        .clickable-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* เปลี่ยนเป็น cover เพื่อแสดงผลรูปเต็มกรอบ */
+            display: block;
+        }
+
+        .click-hint {
+            font-size: 1rem;
+            color: #ff9a9e;
+            margin-top: 20px;
+            letter-spacing: 1.5px;
+            font-weight: 300;
+            animation: pulse 1.8s infinite;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.5; transform: scale(0.98); }
+        }
+
+        .timer-container {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 25px 20px;
+            border-radius: 24px;
+            max-width: 480px;
+            margin: 0 auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .timer-title {
+            font-size: 1.05rem;
+            color: #e5daf0;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            font-weight: 300;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .timer-display {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .time-box {
+            background: rgba(255, 117, 140, 0.04);
+            padding: 12px 10px;
+            border-radius: 16px;
+            min-width: 85px;
+            border: 1px solid rgba(255, 117, 140, 0.2);
+            text-align: center;
+        }
+
+        .time-num {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(180deg, #ffffff, #ff9a9e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .time-label {
+            font-size: 0.75rem;
+            color: #d1c4d4;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 10, 16, 0.4); 
+            backdrop-filter: blur(4px); 
+            -webkit-backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            padding: 20px;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-card {
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            padding: 25px;
+            border-radius: 28px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4), inset 0 0 15px rgba(255, 255, 255, 0.02);
+            transform: translateY(30px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto;
+        }
+
+        .popup-overlay.active .popup-card {
+            transform: translateY(0);
+        }
+
+        /* ปรับสัดส่วนกล่องใส่รูปภาพของ Popup ให้คลีนขึ้นและขยายเต็มรูป */
+        .popup-img-container {
+            width: 100%;
+            height: 320px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            display: block;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ปรับรูปความทรงจำใน Popup ให้ขยายสเกลเต็มกรอบอย่างสมบูรณ์ */
+        .popup-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* เปลี่ยนจาก contain เป็น cover เพื่อให้ภาพขยายชนขอบเต็มกรอบ */
+            display: block;
+        }
+
+        .popup-text {
+            color: #ffffff; 
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-weight: 400;
+            padding: 0 10px;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); 
+        }
+
+        .close-popup-btn {
+            background: linear-gradient(45deg, #ff5e62, #ff758c);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .close-popup-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 20px rgba(255, 94, 98, 0.5);
+        }
+
+        .music-control {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            z-index: 1001;
+            transition: all 0.3s;
+        }
+
+        .music-control:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <video id="videoBg1" class="video-background" autoplay loop muted playsinline>
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260604_125109_19424216-4e2a-4560-b9f2-f1b5f6eb2c2e.mp4" type="video/mp4">
+    </video>
+
+    <video id="videoBg2" class="video-background" autoplay loop muted playsinline>
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260419_065931_e3ca7b53-d32e-4ad5-81de-dc9d6fcfda6d.mp4" type="video/mp4">
+    </video>
+
+    <div class="video-overlay"></div>
+
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <button class="music-control" id="musicBtn" onclick="toggleMusic()" style="display: none;">🔊</button>
+    
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-card">
+            <div class="lock-avatar-container">
+                <img src="lock-avatar.jpg" alt="Love Avatar" class="lock-avatar-img" id="lockAvatar">
+            </div>
+            <h2>Our Memory Lock</h2>
+            <p>ก้าวเข้าสู่ดินแดนความทรงจำของเราสองคน<br>รบกวนคุณที่รักใส่วันครบรอบของเราหน่อยนะคะ ห้ามลืมนะ!</p>
+            <div class="input-group">
+                <input type="text" id="lockDay" class="day-input" placeholder="วันที่" maxlength="2" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <div class="select-wrapper">
+                    <select id="lockMonth" class="month-select">
+                        <option value="">เดือน</option>
+                        <option value="1">มกราคม</option>
+                        <option value="2">กุมภาพันธ์</option>
+                        <option value="3">มีนาคม</option>
+                        <option value="4">เมษายน</option>
+                        <option value="5">พฤษภาคม</option>
+                        <option value="6">มิถุนายน</option>
+                        <option value="7">กรกฎาคม</option>
+                        <option value="8">สิงหาคม</option>
+                        <option value="9">กันยายน</option>
+                        <option value="10">ตุลาคม</option>
+                        <option value="11">พฤศจิกายน</option>
+                        <option value="12">ธันวาคม</option>
+                    </select>
+                </div>
+            </div>
+            <button class="unlock-btn" onclick="checkPassword()">เปิดประตูดินแดนความรัก ✨</button>
+            <div class="error-msg" id="errorMsg">งอนแล้วนะ! ลืมวันสำคัญของเราได้ยังไง คิดใหม่อีกรอบเลย 😤</div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="relationship-date">
+            <h1>Our Journey Began</h1>
+            <p>14 พฤษภาคม 2026 | 14:30 น.</p>
+        </div>
+
+        <div class="main-button-container" onclick="openSurprise()">
+            <div class="image-frame">
+                <img src="img/cover.jpg" alt="Click Me" class="clickable-cover-img">
+            </div>
+            <p class="click-hint">✨ กดตรงรูปภาพเพื่อเปิดกล่องความทรงจำของเรานะเธอ ✨</p>
+        </div>
+
+        <div class="timer-container">
+            <p class="timer-title">เรารักกันและจับมือเคียงข้างกันมาแล้ว...</p>
+            <div class="timer-display">
+                <div class="time-box"><div class="time-num" id="days">00</div><div class="time-label">วัน</div></div>
+                <div class="time-box"><div class="time-num" id="hours">00</div><div class="time-label">ชั่วโมง</div></div>
+                <div class="time-box"><div class="time-num" id="minutes">00</div><div class="time-label">นาที</div></div>
+                <div class="time-box"><div class="time-num" id="seconds">00</div><div class="time-label">วินาที</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-card">
+            <div class="popup-img-container">
+                <img src="" alt="Love Memory" class="popup-img" id="popupImage">
+            </div>
+            <p class="popup-text" id="popupText">ข้อความบอกรักประจำรูปภาพ</p>
+            <button class="close-popup-btn" onclick="closeSurprise()">เปิดดูความทรงจำต่อไป 💖</button>
+        </div>
+    </div>
+
+    <script>
+        const surpriseData = [
+            { img: "img/1.jpg", text: "สุขสันต์วันครบรอบนะคนเก่ง ขอบคุณที่จับมือเดินไปด้วยกันตั้งแต่วันแรกนะ ❤️" },
+            { img: "img/2.jpg", text: "รูปนี้เห็นทีไรก็ยิ้มได้ตลอดเลย ขอบคุณที่เป็นความสดใสในชีวิตให้กันนะ 🥰" },
+            { img: "img/3.jpg", text: "เธอคือสิ่งที่ดีที่สุดที่เกิดขึ้นในชีวิตของฉันเลยนะ รู้ตัวไหม? 🌍" },
+            { img: "img/4.jpg", text: "อยู่เป็นความสุขของกันและกันแบบนี้ไปนานๆ เลยนะ ห้ามเบื่อกันก่อนล่ะ 💖" },
+            { img: "img/5.jpg", text: "ไม่ว่าจะเจอเรื่องเหนื่อยแค่ไหนมา พอมีเธออยู่ข้างๆ ทุกอย่างก็ง่ายขึ้นเยอะเลย 🧸" },
+            { img: "img/6.jpg", text: "ขอบคุณความใส่ใจและทุกๆ เรื่องราวที่เราผ่านไปด้วยกันนะ💕" },
+            { img: "img/7.jpg", text: "รักเธอนะครับ และจะรักแบบนี้เพิ่มขึ้นในทุกๆ วันเลยนะ 🌸" },
+            { img: "img/8.jpg", text: "ทุกโมเมนต์ที่อยู่กับเธอคือความทรงจำที่สเปเชียลที่สุดของฉัน 💝" },
+            { img: "img/9.jpg", text: "ขอบคุณที่คอยซัพพอร์ต คอยเป็นเซฟโซนที่ดีที่สุดให้กันเสมอมานะ 🎀" },
+            { img: "img/10.jpg", text: "ก้าวต่อไปข้างหน้าด้วยกันอีกหลายๆ ปีเลยนะ รักเธอที่สุดครับ รักนะ 💘" }
+        ];
+
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+
+        function createHearts() {
+            const container = document.getElementById('heartsContainer');
+            const heartTypes = ['❤️', '💖', '✨', '💕'];
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart-sparkle');
+                heart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.fontSize = Math.random() * 15 + 10 + 'px';
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        function checkPassword() {
+            let day = document.getElementById('lockDay').value;
+            const month = document.getElementById('lockMonth').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const lockScreen = document.getElementById('lockScreen');
+            const mainContent = document.getElementById('mainContent');
+            const videoBg1 = document.getElementById('videoBg1');
+            const videoBg2 = document.getElementById('videoBg2');
+
+            if(!day) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            day = parseInt(day, 10).toString();
+
+            if (day === '14' && month === '5') {
+                errorMsg.style.display = 'none';
+                
+                videoBg1.style.opacity = '0';
+                videoBg2.style.opacity = '1';
+                
+                lockScreen.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    lockScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    musicBtn.style.display = 'flex';
+                    
+                    try {
+                        bgMusic.play();
+                    } catch (e) {
+                        console.log("Autoplay blocked, waiting for user interaction");
+                    }
+
+                    setTimeout(() => {
+                        mainContent.classList.add('fade-in');
+                        triggerConfetti();
+                    }, 50);
+                }, 800);
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.style.animation = 'shake 0.3s ease-in-out';
+                setTimeout(() => { errorMsg.style.animation = ''; }, 300);
+            }
+        }
+
+        function triggerConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff5e62', '#ff758c', '#ffb3c1', '#ffffff']
+            });
+        }
+
+        function openSurprise() {
+            const randomIndex = Math.floor(Math.random() * surpriseData.length);
+            const currentSurprise = surpriseData[randomIndex];
+            
+            document.getElementById('popupImage').src = currentSurprise.img;
+            document.getElementById('popupText').innerText = currentSurprise.text;
+            
+            document.getElementById('popupOverlay').classList.add('active');
+            triggerConfetti();
+        }
+
+        function closeSurprise() {
+            document.getElementById('popupOverlay').classList.remove('active');
+        }
+
+        function toggleMusic() {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                musicBtn.innerText = "🔊";
+            } else {
+                bgMusic.pause();
+                musicBtn.innerText = "🔇";
+            }
+        }
+
+        function updateTimer() {
+            const startDate = new Date('May 14, 2026 14:30:00').getTime();
+            const now = new Date().getTime();
+            const difference = now - startDate;
+
+            if (difference < 0) {
+                document.getElementById('days').innerText = '00';
+                document.getElementById('hours').innerText = '00';
+                document.getElementById('minutes').innerText = '00';
+                document.getElementById('seconds').innerText = '00';
+                return;
+            }
+
+            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+</body>
+</html>
